@@ -1,0 +1,1 @@
+java -jar /home/user/contiki-ng/tools/cooja/dist/cooja.jar -nogui=PROFIT-4-3-cooja-mote-nogui.csc -contiki=/home/user/contiki-ng
