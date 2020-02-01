@@ -79,7 +79,7 @@ static uint8_t PRoFIT_Send_Pkt(PROFIT_PACKET *pkt, uint16_t len, uip_ipaddr_t *d
     uint16_t qlen = list_length(PRoFIT_Q);
     static uint32_t dropped_hi = 0;
     static uint32_t dropped_lo = 0;
-    static uint32_t enqueued = 0;
+    static uint32_t enqueued = 1;
     
     //LOG_INFO("QueueLen:%d\n", qlen);
 
@@ -93,7 +93,7 @@ static uint8_t PRoFIT_Send_Pkt(PROFIT_PACKET *pkt, uint16_t len, uip_ipaddr_t *d
         {
             dropped_lo++;
         }
-        LOG_INFO("PROFIT_Q_FULL: [T:%d][H:%d][L:%d]\n", enqueued, dropped_hi, dropped_lo);
+        LOG_INFO("DROPPED :T:%d:H:%d:L:%d:\n", enqueued, dropped_hi, dropped_lo);
         return -1;
     }
 
@@ -157,6 +157,7 @@ PROCESS_THREAD(gen_process, ev, data)
     static struct etimer periodic_timer;
     static uint32_t count;
     static uint16_t i;
+    static uint8_t priority;
 
     uip_ipaddr_t dest_ipaddr;
 
@@ -187,7 +188,13 @@ PROCESS_THREAD(gen_process, ev, data)
                 //LOG_INFO_6ADDR(&dest_ipaddr);
                 //LOG_INFO_("\n");
                 pkt.seq = count;
-                PRoFIT_Send_Pkt(&pkt, sizeof(pkt), &dest_ipaddr, (1+count%2));
+                priority = 1 + count % 2;
+                PRoFIT_Send_Pkt(&pkt, sizeof(pkt), &dest_ipaddr, priority);
+                LOG_INFO("SENDER Seq:%d:P:%d:SINK:%d:\n", 
+                         pkt.seq,
+                         priority,
+                         dest_ipaddr.u8[15]);
+                
                 count++;
                 if (count == PROFIT_MAX_PKTS_TO_SEND)
                 {

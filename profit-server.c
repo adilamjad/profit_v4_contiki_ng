@@ -70,7 +70,7 @@ static void udp_rx_callback(struct simple_udp_connection *c,
         pkt_received_lo++;    
     }
 
-    LOG_INFO("SINK:[SQ:%d][P_HI:%d][P_LO:%d][L:%d][D_FIRST:%d][D_LAST:%d][SR:%d]\n", 
+    LOG_INFO("SINK Seq:%d:PH:%d:PL:%d:LEN:%d:D1:%d:DL:%d:SR:%d:\n", 
              pkt->seq,
              pkt_received_hi,
              pkt_received_lo,
