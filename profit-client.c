@@ -93,7 +93,7 @@ static uint8_t PRoFIT_Send_Pkt(PROFIT_PACKET *pkt, uint16_t len, uip_ipaddr_t *d
         {
             dropped_lo++;
         }
-        LOG_INFO("DROPPED :T:%d:H:%d:L:%d:S:%d:\n", enqueued, dropped_hi, dropped_lo, pkt->seq);
+        LOG_INFO("DROPPED :T:%d:H:%d:L:%d:S:%d:P:%d:\n", enqueued, dropped_hi, dropped_lo, pkt->seq, p);
         return -1;
     }
 

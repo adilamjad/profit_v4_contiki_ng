@@ -70,14 +70,15 @@ static void udp_rx_callback(struct simple_udp_connection *c,
         pkt_received_lo++;    
     }
 
-    LOG_INFO("SINK Seq:%d:PH:%d:PL:%d:LEN:%d:D1:%d:DL:%d:SR:%d:\n", 
+    LOG_INFO("SINK Seq:%d:PH:%d:PL:%d:LEN:%d:D1:%d:DL:%d:SR:%d:P:%d:\n", 
              pkt->seq,
              pkt_received_hi,
              pkt_received_lo,
              datalen, 
              pkt->data[0], 
              pkt->data[PROFIT_MAX_DATA_LEN-1],
-             sender_addr->u8[15]);
+             sender_addr->u8[15],
+             pkt->priority);
     //LOG_INFO_("\n");
     /*
     LOG_INFO("Received request '%.*s' from ", datalen, (char *) data);
