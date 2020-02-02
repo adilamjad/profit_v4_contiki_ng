@@ -645,7 +645,7 @@
 TIMEOUT(40000000);
 
 while (true) {
-  log.log(time + ":" + id + ":" + msg + "\n");
+  log.log((time/1000) + ":" + id + ":" + msg + "\n");
   YIELD();
 }</script>
       <active>true</active>

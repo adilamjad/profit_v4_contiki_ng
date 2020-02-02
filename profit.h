@@ -2,7 +2,7 @@
 #define PROFIT_H_
 
 #include "sys/node-id.h"
-
+#include "sim_config.h"
 
 #define PROFIT_MAX_DATA_LEN         100
 #define PROFIT_MAX_QUEUE_LEN        8
@@ -13,8 +13,9 @@
 #define PROFIT_PRIORITY_HI          1
 #define PROFIT_PRIORITY_LO          2
 
-
 typedef uint8_t PRIORITY;
+
+#define PKT_TX_INTERVAL                  (16*CLOCK_SECOND)
 
 
 /* PRoFIT Structure for Packet */

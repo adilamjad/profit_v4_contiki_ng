@@ -17,9 +17,6 @@
 #define UDP_CLIENT_PORT        8765
 #define UDP_SERVER_PORT        5678
 
-#define PKT_GEN_INTERVAL                 (30*CLOCK_SECOND)
-#define PKT_TX_INTERVAL                  (60*CLOCK_SECOND)
-
 static struct simple_udp_connection udp_conn;
 
 static PROFIT_PACKET pkt;
@@ -110,7 +107,8 @@ static uint8_t PRoFIT_Send_Pkt(PROFIT_PACKET *pkt, uint16_t len, uip_ipaddr_t *d
         memcpy(&pqe->pkt, pkt, len);
         pqe->len = len;
         pqe->dest_ipaddr = dest_ipaddr;
-        
+
+#ifndef NO_PROFIT        
         if (p == PROFIT_PRIORITY_HI)
         {
             /* Insert high priority packet into queue head. */
@@ -121,7 +119,10 @@ static uint8_t PRoFIT_Send_Pkt(PROFIT_PACKET *pkt, uint16_t len, uip_ipaddr_t *d
             /* Insert low priority packet into queue tail. */
             list_add(PRoFIT_Q, pqe);
         }
-
+#else
+        /* Insert low priority packet into queue tail. */
+        list_add(PRoFIT_Q, pqe);
+#endif
         /* Increment number of enqueued packets. */
         enqueued++;
     }
@@ -233,9 +234,12 @@ PROCESS_THREAD(profit_q_process, ev, data)
 
     
     PROCESS_BEGIN();
-    
-    LOG_INFO("Started PRoFIT queing process on Node: %d\n", node_id);
 
+#ifndef NO_PROFIT        
+    LOG_INFO("Started PRoFIT queing process on Node: %d\n", node_id);
+#else
+    LOG_INFO("Not running PRoFIT on Node: %d\n", node_id);
+#endif   
     etimer_set(&periodic_timer, random_rand() % PKT_TX_INTERVAL);
 
     while(1) 
