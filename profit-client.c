@@ -82,16 +82,40 @@ static uint8_t PRoFIT_Send_Pkt(PROFIT_PACKET *pkt, uint16_t len, uip_ipaddr_t *d
 
     if (qlen > (PROFIT_MAX_QUEUE_LEN-1))
     {
-        if (p == PROFIT_PRIORITY_HI)
+        PROFIT_Q_ELEMENT *tmp;
+        for (tmp = list_head(PRoFIT_Q);
+             tmp != NULL;
+             tmp = list_item_next(tmp)) 
         {
-            dropped_hi++;
+             printf("pkt->seq: %d\tpkt->priority: %d\n", tmp->pkt.seq, tmp->pkt.priority);
         }
-        else if (p == PROFIT_PRIORITY_LO)
+
+        tmp = list_tail(PRoFIT_Q);
+
+        if (tmp)
         {
-            dropped_lo++;
+#ifndef NO_PROFIT        
+            if ((tmp->pkt.priority == PROFIT_PRIORITY_LO) &&
+                (p == PROFIT_PRIORITY_HI))
+            {
+                list_remove(PRoFIT_Q, tmp);
+                memb_free(&PRoFIT_Q_Mem, tmp);
+            }
+            else
+#endif
+            {
+                if (p == PROFIT_PRIORITY_HI)
+                {
+                    dropped_hi++;
+                }
+                else if (p == PROFIT_PRIORITY_LO)
+                {
+                    dropped_lo++;
+                }
+                LOG_INFO("DROPPED :T:%d:H:%d:L:%d:S:%d:P:%d:\n", enqueued, dropped_hi, dropped_lo, pkt->seq, p);
+                return -1;
+            }
         }
-        LOG_INFO("DROPPED :T:%d:H:%d:L:%d:S:%d:P:%d:\n", enqueued, dropped_hi, dropped_lo, pkt->seq, p);
-        return -1;
     }
 
     PROFIT_Q_ELEMENT *pqe;
@@ -120,7 +144,7 @@ static uint8_t PRoFIT_Send_Pkt(PROFIT_PACKET *pkt, uint16_t len, uip_ipaddr_t *d
             list_add(PRoFIT_Q, pqe);
         }
 #else
-        /* Insert low priority packet into queue tail. */
+        /* Insert always at the tail if PROFIT is disabled. */
         list_add(PRoFIT_Q, pqe);
 #endif
         /* Increment number of enqueued packets. */
@@ -279,7 +303,8 @@ PROCESS_THREAD(profit_q_process, ev, data)
             }
         }
         /* Add some jitter */
-        etimer_set(&periodic_timer, PKT_TX_INTERVAL - CLOCK_SECOND + (random_rand() % (2 * CLOCK_SECOND)));
+        //etimer_set(&periodic_timer, PKT_TX_INTERVAL - CLOCK_SECOND + (random_rand() % (2 * CLOCK_SECOND)));
+        etimer_set(&periodic_timer, PKT_TX_INTERVAL);
     }
 
     PROCESS_END();

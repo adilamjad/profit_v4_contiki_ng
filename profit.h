@@ -29,7 +29,7 @@ typedef struct profit_packet
 /* PRoFIT Queue */
 typedef struct profit_queue_struct {
   struct profit_queue_struct *next;
-  struct simple_udp_connection *udp_conn;
+  //struct simple_udp_connection *udp_conn;
   uint16_t len;
   uip_ipaddr_t *dest_ipaddr;
   PROFIT_PACKET pkt;
